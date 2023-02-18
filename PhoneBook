@@ -1,0 +1,90 @@
+package practice;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class PhoneBook {
+    private Map<String, Set<String>> phoneBook;
+
+    public PhoneBook() {
+        phoneBook = new HashMap<>();
+    }
+
+    public void addContact(String phone, String name) {
+        if (!isValidName(name) || !isValidPhone(phone)) {
+            System.out.println("Wrong format");
+            return;
+        }
+
+        Set<String> phones = phoneBook.get(name);
+        if (phones == null) {
+            phones = new HashSet<>();
+            phoneBook.put(name, phones);
+        }
+
+        phones.add(phone);
+        System.out.println("Contact is added");
+
+        for (Map.Entry<String, Set<String>> entry : phoneBook.entrySet()) {
+            String owner = entry.getKey();
+            Set<String> numbers = entry.getValue();
+            if (numbers.contains(phone) && !owner.equals(name)) {
+                numbers.remove(phone);
+                System.out.println("Contact is overwritten");
+            }
+        }
+    }
+
+
+    public String getContactByPhone(String phone) {
+        for (Map.Entry<String, Set<String>> entry : phoneBook.entrySet()) {
+            String name = entry.getKey();
+            Set<String> phones = entry.getValue();
+            if (phones.contains(phone)) {
+                return name + " - " + phone;
+            }
+        }
+        return "";
+    }
+
+    public Set<String> getContactByName(String name) {
+        Set<String> result = new HashSet<>();
+        Set<String> phones = phoneBook.get(name);
+        if (phones != null) {
+            for (String phone : phones) {
+                result.add(name + " - " + phone);
+            }
+        }
+        return result;
+    }
+
+    public Set<String> getAllContacts() {
+        Set<String> result = new HashSet<>();
+        for (Map.Entry<String, Set<String>> entry : phoneBook.entrySet()) {
+            String name = entry.getKey();
+            Set<String> phones = entry.getValue();
+            if (phones.size() > 1) {
+                String phoneList = String.join(", ", phones);
+                result.add(name + " - " + phoneList);
+            } else {
+                for (String phone : phones) {
+                    result.add(name + " - " + phone);
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean isValidName(String name) {
+        Pattern pattern = Pattern.compile("^[A-Za-zА-Яа-я\\s]+$");
+        Matcher matcher = pattern.matcher(name);
+        return matcher.matches();
+    }
+
+    private boolean isValidPhone(String phone) {
+        Pattern pattern = Pattern.compile("^\\d+");
+        Matcher matcher = pattern.matcher(phone);
+        return matcher.matches();
+    }
+}
